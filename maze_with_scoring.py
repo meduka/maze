@@ -20,18 +20,18 @@ clock = pygame.time.Clock()
 refresh_rate = 60
 
 # Colors
+RED = (255, 0, 0)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
+GREEN = (0, 255, 0)
+
 
 # Make a player
-player =  [200, 150, 25, 25]
-player_vx = 0
-player_vy = 0
-player_speed = 5
+player1 =  [200, 150, 25, 25]
+vel1 = [0, 0]
+player1_speed = 5
+score1 = 0
 
 # make walls
 wall1 =  [300, 275, 200, 25]
@@ -50,8 +50,6 @@ coins = [coin1, coin2, coin3]
 
 # Game loop
 win = False
-score = 0
-
 done = False
 
 while not done:
@@ -68,43 +66,43 @@ while not done:
     left = pressed[pygame.K_LEFT]
     right = pressed[pygame.K_RIGHT]
 
-    if up:
-        player_vy = -player_speed
-    elif down:
-        player_vy = player_speed
-    else:
-        player_vy = 0
-        
     if left:
-        player_vx = -player_speed
+        vel1[0] = -player1_speed
     elif right:
-        player_vx = player_speed
+        vel1[0] = player1_speed
     else:
-        player_vx = 0
+        vel1[0] = 0
 
+    if up:
+        vel1[1] = -player1_speed
+    elif down:
+        vel1[1] = player1_speed
+    else:
+        vel1[1] = 0
+        
         
     # Game logic (Check for collisions, update points, etc.)
     ''' move the player in horizontal direction '''
-    player[0] += player_vx
+    player1[0] += vel1[0]
 
     ''' resolve collisions horizontally '''
     for w in walls:
-        if intersects.rect_rect(player, w):        
-            if player_vx > 0:
-                player[0] = w[0] - player[2]
-            elif player_vx < 0:
-                player[0] = w[0] + w[2]
+        if intersects.rect_rect(player1, w):        
+            if vel1[0] > 0:
+                player1[0] = w[0] - player1[2]
+            elif vel1[0] < 0:
+                player1[0] = w[0] + w[2]
 
     ''' move the player in vertical direction '''
-    player[1] += player_vy
+    player1[1] += vel1[1]
     
     ''' resolve collisions vertically '''
     for w in walls:
-        if intersects.rect_rect(player, w):                    
-            if player_vy > 0:
-                player[1] = w[1] - player[3]
-            if player_vy < 0:
-                player[1] = w[1] + w[3]
+        if intersects.rect_rect(player1, w):                    
+            if vel1[1] > 0:
+                player1[1] = w[1] - player1[3]
+            if vel1[1]< 0:
+                player1[1] = w[1] + w[3]
 
 
     ''' here is where you should resolve player collisions with screen edges '''
@@ -112,30 +110,20 @@ while not done:
 
 
 
-
     ''' get the coins '''
-    #coins = [c for c in coins if not intersects.rect_rect(player, c)]
-
-    '''
     hit_list = []
 
     for c in coins:
-        if intersects.rect_rect(player, c):
+        if intersects.rect_rect(player1, c):
             hit_list.append(c)
-    '''
      
-    hit_list = [c for c in coins if intersects.rect_rect(player, c)]
+    hit_list = [c for c in coins if intersects.rect_rect(player1, c)]
     
     for hit in hit_list:
         coins.remove(hit)
-        score += 1
+        score1 += 1
         print("sound!")
         
-
-        
-    
-
-    
     if len(coins) == 0:
         win = True
 
@@ -143,20 +131,17 @@ while not done:
     # Drawing code (Describe the picture. It isn't actually drawn yet.)
     screen.fill(BLACK)
 
-    pygame.draw.rect(screen, WHITE, player)
+    pygame.draw.rect(screen, WHITE, player1)
     
     for w in walls:
         pygame.draw.rect(screen, RED, w)
 
     for c in coins:
         pygame.draw.rect(screen, YELLOW, c)
-
-
-    # blit score on the screen somewhere
-    
+        
     if win:
         font = pygame.font.Font(None, 48)
-        text = font.render("You Win!", 1, BLUE)
+        text = font.render("You Win!", 1, GREEN)
         screen.blit(text, [400, 200])
 
     
