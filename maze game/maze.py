@@ -10,7 +10,7 @@ pygame.init()
 WIDTH = 800
 HEIGHT = 600
 SIZE = (WIDTH, HEIGHT)
-TITLE = "Maze"
+TITLE = "Cube Dudes: Great Escape!"
 screen = pygame.display.set_mode(SIZE)
 pygame.display.set_caption(TITLE)
 
@@ -54,20 +54,32 @@ wall7 = [500, 100, 250, 25]
 wall8 = [550, 150, 250, 25]
 wall9 = [775, 0, 25, 175]
 wall10 = [500, 0, 25, 500]
-wall11 = [550, 200, 25, 275]
+wall11 = [550, 250, 25, 225]
+wall12 = [550, 200, 150, 25]
+wall13 = [725, 200, 25, 150]
+wall14 = [600, 250, 150, 25]
+wall15 = [550, 350, 150, 25]
+wall16 = [550, 300, 250, 25]
+wall17 = [500, 200, 50, 25]
+
 
 wallA = [600,400, 200, 25]
 wallB = [600, 400, 25, 250]
 wallC= [775, 400, 25, 250]
-wallD = [500, 0, 25, 100]
+wallD = [775, 100, 25, 400]
+
 
 walls = [wall1, wall2, wall3, wall4, wall5,
-         wall6, wall7, wall8, wall9, wall10, wall11 ]
+         wall6, wall7, wall8, wall9, wall10,
+         wall11, wall12, wall13, wall14, wall15,
+         wall16, wall17]
 
 
-walls2 = [ wallA, wallB, wallC]
+walls2 = [ wallA, wallB, wallC, wallD]
 
+trap1 = [675, 500, 25, 250]
 
+traps = [trap1]
 
 # Make coins
 coin1 = [300, 500, 25, 25]
@@ -110,6 +122,8 @@ setup()
 win = False
 done = False
 keyget = False
+
+
 while not done:
     # Event processing (React to key presses, mouse clicks, etc.)
     ''' for now, we'll just check to see if the X is clicked '''
@@ -202,21 +216,21 @@ while not done:
                     player2[0] = w[0] - player2[2]
                 elif vel2[0] < 0:
                     player2[0] = w[0] + w[2]
+                    
+        if not keyget:
+            for w in walls2:
+                if intersects.rect_rect(player1, w):        
+                    if vel1[0] > 0:
+                        player1[0] = w[0] - player1[2]
+                    elif vel1[0] < 0:
+                        player1[0] = w[0] + w[2]
 
-        for w in walls2:
-            if intersects.rect_rect(player1, w):        
-                if vel1[0] > 0:
-                    player1[0] = w[0] - player1[2]
-                elif vel1[0] < 0:
-                    player1[0] = w[0] + w[2]
-
-            if intersects.rect_rect(player2, w):        
-                if vel2[0] > 0:
-                    player2[0] = w[0] - player2[2]
-                elif vel2[0] < 0:
-                    player2[0] = w[0] + w[2]
-
-
+                if intersects.rect_rect(player2, w):        
+                    if vel2[0] > 0:
+                        player2[0] = w[0] - player2[2]
+                    elif vel2[0] < 0:
+                        player2[0] = w[0] + w[2]
+ 
 
 
         ''' resolve collisions vertically '''
@@ -233,7 +247,23 @@ while not done:
                     player2[1] = w[1] - player2[3]
                 elif vel2[1]< 0:
                     player2[1] = w[1] + w[3]
+                    
+        if not keyget:             
+            for w in walls2:
+                if intersects.rect_rect(player1, w):                    
+                    if vel1[1] > 0:
+                        player1[1] = w[1] - player1[3]
+                    elif vel1[1]< 0:
+                        player1[1] = w[1] + w[3]
 
+
+                if intersects.rect_rect(player2, w):                    
+                    if vel2[1] > 0:
+                        player2[1] = w[1] - player2[3]
+                    elif vel2[1]< 0:
+                        player2[1] = w[1] + w[3]
+                        
+                
         for k in keys:
             if intersects.rect_rect(player1, k):
                 keyget = True
@@ -256,25 +286,46 @@ while not done:
     
     ''' get block edges (makes collision resolution easier to read) '''
      
-    left = player1[0] 
-    right = player1[0] + player1[2]
-    top = player1[1]
-    bottom = player1[1] + player1[3]
+    block_left1 = player1[0] 
+    block_right1 = player1[0] + player1[2]
+    block_top1 = player1[1]
+    block_bottom1 = player1[1] + player1[3]
+
+    block_left2 = player2[0] 
+    block_right2 = player2[0] + player2[2]
+    block_top2 = player2[1]
+    block_bottom2 = player2[1] + player2[3]
 
     ''' if the block is moved completely off of the window, reposition it on the other side '''
 
     
-    if left > WIDTH:
+    if block_left1 > WIDTH:
         player1[0] = 0 - player1[2]
         
-    elif right < 0:
+    elif block_right1 < 0:
         player1[0] = WIDTH
+
+
+
+    if block_left2 > WIDTH:
+        player2[0] = 0 - player2[2]
+        
+    elif block_right2 < 0:
+        player2[0] = WIDTH
+
        
-    if bottom < 0:
+    if block_bottom1 < 0:
         player1[1] = HEIGHT
         
-    elif top > HEIGHT:
+    elif block_top1 > HEIGHT:
         player1[1] = 0 - player1[3]
+
+
+    if block_bottom2 < 0:
+        player1[1] = HEIGHT
+        
+    elif block_top2 > HEIGHT:
+        player2[1] = 0 - player2[3]
 
 
 
@@ -318,8 +369,19 @@ while not done:
         pygame.draw.rect(screen, WHITE, w)
         
     if not keyget:
+        walls2 = [ wallA, wallB, wallC, wallD]
+
+
         for a in walls2:
             pygame.draw.rect(screen, WHITE, a)
+    if keyget:
+        
+        walls2 = []
+
+        traps = [trap1]
+        
+        for t in traps:
+            pygame.draw.rect(screen, GREEN, t)
 
     for c in coins:
         pygame.draw.rect(screen, YELLOW, c)
